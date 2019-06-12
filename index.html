@@ -1,0 +1,63 @@
+  <!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+  <title>2D  карта</title>
+  <link rel="stylesheet" href="https://js.arcgis.com/4.10/esri/css/main.css">
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://js.arcgis.com/4.10/"></script>
+  <script src="js/script.js"></script>
+</head>
+<body>
+  <div id="viewDiv">
+    <div id="apz" class="apz"><b>АПЗ</b></div>
+    <div id="sketch" class="sketch"><b>Эскизный проект</b></div>
+    <div id="info" class="info">
+      <table>
+        <caption id="service" class="service"></caption>
+        <tr>
+          <th class="status">Статус</th>
+          <th>Кол-во</th>
+          <th>Цвет</th>
+        </tr>
+        <tr>
+          <td class="status-accepted">Принятые</td>
+          <td id="statusAccepted"></td>
+          <td>
+            <div class="colorAccepted"></div>
+          </td>
+        </tr>
+        <tr>
+          <td class="status-active">Активные</td>
+          <td id="statusActive"></td>
+          <td>
+            <div class="colorActive"></div>
+          </td>
+        </tr>
+        <tr>
+          <td class="status-declined">Отказаные</td>
+          <td id="statusDeclined"></td>
+          <td>
+            <div class="colorDeclined"></div>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <div id="onClickLoader">
+  		<div class="spinner">
+  			<div class="double-bounce1"></div>
+  			<div class="double-bounce2"></div>
+  		</div>
+  	</div>
+    <div id="main_loading">
+      <div class="cssload-thecube">
+        <div class="cssload-cube cssload-c1"></div>
+        <div class="cssload-cube cssload-c2"></div>
+        <div class="cssload-cube cssload-c4"></div>
+        <div class="cssload-cube cssload-c3"></div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

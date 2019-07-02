@@ -61,6 +61,7 @@ td:last-child {
   top: 0px;
   left: 50px;
   width: 165px;
+  border-radius: 15px 15px 0px 0px;
   /* box-sizing: border-box; */
   background-image: url('../assets/icon/search.png');
   background-position: 5px 7px;
@@ -78,13 +79,14 @@ td:last-child {
   position: absolute;
   top: 40px;
   left: 50px;
-  width: 225px;
+  width: 230px;
   list-style-type: none;
   padding-left: 0;
   margin: 0;
   max-height: 184px;
   overflow-y: auto;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  border-radius: 0px 0px 15px 15px;
 }
 .liSearch {
   padding: 10px;
@@ -99,7 +101,9 @@ td:last-child {
   background-color: #fffbc3;
   cursor: pointer;
 }
-
+.borderInput {
+  border-radius: 15px 15px 15px 15px;
+}
 :focus {
   outline: 0px!important;
 }

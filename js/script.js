@@ -263,18 +263,20 @@ require([
 //////////////////////////////////////////////////////////////////////////
     ulSearch.addEventListener('click', function(e) {
       let id = e.target.id;
-      
+
       switch (id) {
         case 'cad':
           removeInvalid();
           input.placeholder = 'Введите кад. номер';
           searchBy = 'cad';
+          input.classList.add('borderInput');
           clearUl();
           break;
         case 'id':
           removeInvalid();
           input.placeholder = 'Введите ID заявления';
           searchBy = 'id';
+          input.classList.add('borderInput');
           clearUl();
           break;
         case 'changeSearch':
@@ -285,6 +287,7 @@ require([
           break;
         default:
           clearUl();
+          addChangeSearch();
           goToBuild(e.toElement.attributes[0].nodeValue);
       }
     })
@@ -342,7 +345,7 @@ require([
     }
 
     const checkValue = value => {
-
+      input.classList.remove('borderInput');
       clearUl();
 
       if (searchBy == 'cad') {
@@ -748,7 +751,7 @@ require([
           popupTemplate = {
             title: status,
             content: "<b>ID заявления:</b> " + backData[index][j].id + "</br>"+
-            +"<b>Наименование проектируемого объекта:</b> " + backData[index][j].project_name + "</br>"+
+            "<b>Наименование проектируемого объекта:</b> " + backData[index][j].project_name + "</br>"+
             "<b>Заказчик:</b> " + backData[index][j].customer + "</br>"+
             "<b>Тип объекта:</b> " + backData[index][j].object_type + "</br>"+
             "<b>Площадь здания (кв.м):</b> " + backData[index][j].object_area + "</br>"+

@@ -4,13 +4,20 @@
   <meta charset="utf-8">
   <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
   <title>2D  карта</title>
-  <link rel="stylesheet" href="https://js.arcgis.com/4.10/esri/css/main.css">
+  <link rel="stylesheet" href="https://js.arcgis.com/4.11/esri/css/main.css">
   <link rel="stylesheet" href="css/style.css">
-  <script src="https://js.arcgis.com/4.10/"></script>
+  <script src="https://js.arcgis.com/4.11/"></script>
   <script src="js/script.js"></script>
 </head>
 <body>
   <div id="viewDiv">
+    <div id="divSearch" class="search">
+      <input id="inputSearch" class="input" type="text" maxlength="15" placeholder="Выберите тип поиска" value="">
+      <ul id="ulSearch" class="ulSearch">
+        <li id="id" class="liSearch">Поиск по ID заявления</li>
+        <li id="cad" class="liSearch">Поиск по кад. номеру</li>
+      </ul>
+    </div>
     <div id="apz" class="apz"><b>АПЗ</b></div>
     <div id="sketch" class="sketch"><b>Эскизный проект</b></div>
     <div id="info" class="info">

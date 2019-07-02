@@ -12,6 +12,9 @@ table {
   font-weight: bold;
   border-spacing: 0px!important;
 }
+tr {
+  background-color: white;
+}
 tr:last-child {
   border-radius: 0 0 20px 20px;
 }
@@ -49,6 +52,52 @@ td:first-child {
 }
 td:last-child {
   border-width: 1px 2px 1px 1px;
+}
+.invalid {
+  border: 1px solid red!important;
+}
+.input {
+  position: absolute;
+  top: 0px;
+  left: 50px;
+  width: 165px;
+  /* box-sizing: border-box; */
+  background-image: url('../assets/icon/search.png');
+  background-position: 5px 7px;
+  background-repeat: no-repeat;
+  font-size: 16px;
+  padding: 10px 20px 12px 45px;
+  border: none;
+  /* border-bottom: 1px solid #ddd; */
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+/* .input:focus {
+  outline: 3px solid #ddd;
+} */
+.ulSearch {
+  position: absolute;
+  top: 40px;
+  left: 50px;
+  width: 225px;
+  list-style-type: none;
+  padding-left: 0;
+  margin: 0;
+  max-height: 184px;
+  overflow-y: auto;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+.liSearch {
+  padding: 10px;
+  border-bottom: 1px solid #dddddd;
+  text-align: center;
+  background-color: white;
+}
+.liSearch:last-child {
+  border: 0;
+}
+.liSearch:hover {
+  background-color: #fffbc3;
+  cursor: pointer;
 }
 
 :focus {
@@ -184,7 +233,8 @@ td:last-child {
   border-radius: 50%;
   border: 2px solid #cecccc;
 }
-.esri-popup__main-container {
+
+/* .esri-popup__main-container {
   outline: none;
   pointer-events: auto;
   position: relative;
@@ -201,7 +251,7 @@ td:last-child {
 .esri-popup--aligned-top-center {
     transform-origin: 50% 100%;
     position: relative!important;
-}
+} */
 
 /* Анимация загрузки */
 #main_loading {

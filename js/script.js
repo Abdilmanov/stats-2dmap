@@ -9,13 +9,14 @@ require([
   "esri/tasks/QueryTask",
   "esri/tasks/support/Query",
   "esri/layers/FeatureLayer",
+
   ], function(
     MapView, Map, IdentifyTask, IdentifyParameters, TileLayer, Home, GraphicsLayer,
     QueryTask, Query, FeatureLayer
   ) {
-    var map, view, almatyLayer, identifyTask, home, resultsLayer, allMassiv = [],
+    var map, view, almatyLayer, identifyTask, home, resultsLayer, backData = [],
     green = [], purple = [], red = [], accepted = 0, declined = 0, active = 0,
-    popupTemplate;
+    popupTemplate, searchBy = 'change', peakResults = [];
     var gisBasemapUrl = "https://gis.uaig.kz/server/rest/services/BaseMapAlm_MIL1/MapServer";
     var peaksUrl = "https://gis.uaig.kz/server/rest/services/BaseMapAlm_MIL1/MapServer/13"
 
@@ -62,18 +63,24 @@ require([
     view.when(function(){
       document.getElementById('main_loading').style.display = 'none';
 
+      // view.ui.add("search", "top-left");
       view.ui.add("apz", "top-right");
       view.ui.add("sketch", "top-right");
-      view.ui.add("info", "bottom-left");
-
-      var apz = document.getElementById("apz");
-      var sketch = document.getElementById("sketch");
-      var info = document.getElementById("info");
-      var service = document.getElementById("service");
+      view.ui.add("info", "bottom-right");
+      view.ui.add("divSearch", "top-left");
 
       backEnd('apz');
 
-    })
+    });
+
+    var apz = document.getElementById("apz");
+    var sketch = document.getElementById("sketch");
+    var info = document.getElementById("info");
+    var service = document.getElementById("service");
+    var ulSearch = document.getElementById('ulSearch');
+    var input = document.getElementById("inputSearch");
+    // var id = document.getElementById("id");
+    // var cad = document.getElementById("cad");
 
     apz.addEventListener("click", function(){
       service.innerHTML = "АПЗ";
@@ -85,8 +92,333 @@ require([
       backEnd('sketch');
     });
 
-    function backEnd(e){
+    // id.addEventListener('click', () => {
+    //   searchBy = 'id';
+    //   clearUl();
+    // })
+    //
+    // cad.addEventListener('click', () => {
+    //   searchBy = 'cad';
+    //   clearUl();
+    // })
 
+//////////////////////////////////////////////////////////////////////////
+    input.addEventListener('input', function() {
+
+      if (searchBy == 'change') {
+        // input.addEventListener('keypress', function(e) {
+          if (input.value.length > 0) {
+            input.value = '';
+            addInvalid();
+          }
+        // });
+      } else if (searchBy == 'cad') {
+        var format_and_pos = function(char, backspace) {
+
+          var start = 0;
+          var end = 0;
+          var pos = 0;
+          var separator = "-";
+          var value = input.value;
+
+          if (char !== false){
+            start = input.selectionStart;
+            end = input.selectionEnd;
+
+            if (backspace && start > 0) { // handle backspace onkeydown
+              start--;
+
+              if (value[start] == separator){
+                start--;
+              }
+            }
+            // To be able to replace the selection if there is one
+            value = value.substring(0, start) + char + value.substring(end);
+
+            pos = start + char.length; // caret position
+          }
+
+          var d = 0; // digit count
+          var dd = 0; // total
+          var gi = 0; // group index
+          var newV = "";
+          var groups = /^\D*3[47]/.test(value) ? [2, 3, 3, 3] : [2, 3, 3, 4];
+
+          for (var i = 0; i < value.length; i++)  {
+            if (/\D/.test(value[i])){
+                if (start > i){
+                  pos--;
+                }
+            } else {
+              if (d === groups[gi]) {
+                newV += separator;
+                d = 0;
+                gi++;
+
+                if (start >= i) {
+                  pos++;
+                }
+              }
+              newV += value[i];
+              d++;
+              dd++;
+            }
+            if (d === groups[gi] && groups.length === gi + 1) { // max length
+              break;
+            }
+          }
+          input.value = newV;
+
+          if (char !== false) {
+            input.setSelectionRange(pos, pos);
+          }
+          checkValue(input.value);
+        };
+
+        input.addEventListener('keypress', function(e) {
+          if (searchBy == 'change') {
+            // input.addEventListener('keypress', function(e) {
+              if (input.value.length > 0) {
+                input.value = '';
+                addInvalid();
+              }
+            // });
+          } else if (searchBy == 'cad') {
+            var code = e.charCode || e.keyCode || e.which;
+            // Check for tab and arrow keys (needed in Firefox)
+            if (code !== 9 && (code < 37 || code > 40) &&
+            // and CTRL+C / CTRL+V
+            !(e.ctrlKey && (code === 99 || code === 118 || code === 97))) {
+              e.preventDefault();
+
+              var char = String.fromCharCode(code);
+
+              // if the character is non-digit
+              // OR
+              // if the value already contains 15/16 digits and there is no selection
+              // -> return false (the character is not inserted)
+
+              if (/\D/.test(char) || (this.selectionStart === this.selectionEnd &&
+              this.value.replace(/\D/g, '').length >=
+              (/^\D*3[47]/.test(this.value) ? 14 : 15))) { // 15 digits if Amex
+                  return false;
+              }
+
+              format_and_pos(char);
+            }
+          } else if (searchBy == 'id') {
+            if (input.value == '') {
+              clearUl();
+              addChangeSearch();
+            } else {
+              checkValue(input.value);
+            }
+          }
+        });
+
+        // backspace doesn't fire the keypress event
+        input.addEventListener('keydown', function(e) {
+          if (searchBy == 'change') {
+            // input.addEventListener('keypress', function(e) {
+              if (input.value.length > 0) {
+                input.value = '';
+                addInvalid();
+              }
+            // });
+          } else if (searchBy == 'cad') {
+            if (e.keyCode === 8 || e.keyCode === 46) { // backspace or delete
+                e.preventDefault();
+                format_and_pos('', this.selectionStart === this.selectionEnd);
+            }
+            if (input.value == '') {
+              clearUl();
+              addChangeSearch();
+            }
+          }else if (searchBy == 'id') {
+            if (input.value == '') {
+              clearUl();
+              addChangeSearch();
+            } else {
+              checkValue(input.value);
+            }
+          }
+        });
+
+        input.addEventListener('paste', function(e) {
+          e.preventDefault();
+          var paste_text = e.clipboardData.getData('Text').match(/\d/g);
+          paste_text.forEach((number) => {
+            format_and_pos(number);
+          })
+        });
+      } else if (searchBy == 'id') {
+        if (input.value == '') {
+          clearUl();
+          addChangeSearch();
+        } else {
+          checkValue(input.value);
+        }
+      }
+    });
+//////////////////////////////////////////////////////////////////////////
+    ulSearch.addEventListener('click', function(e) {
+      let id = e.target.id;
+      
+      switch (id) {
+        case 'cad':
+          removeInvalid();
+          input.placeholder = 'Введите кад. номер';
+          searchBy = 'cad';
+          clearUl();
+          break;
+        case 'id':
+          removeInvalid();
+          input.placeholder = 'Введите ID заявления';
+          searchBy = 'id';
+          clearUl();
+          break;
+        case 'changeSearch':
+          input.placeholder = 'Выберите тип поиска';
+          searchBy = 'change';
+          clearUl();
+          addUlIdCad();
+          break;
+        default:
+          clearUl();
+          goToBuild(e.toElement.attributes[0].nodeValue);
+      }
+    })
+
+    const addInvalid = () => {
+      document.getElementById('id').classList.add("invalid");
+      document.getElementById('cad').classList.add("invalid");
+    }
+
+    const removeInvalid = () => {
+      id.classList.remove("invalid");
+      cad.classList.remove("invalid");
+    }
+
+    const goToBuild = cad => {
+      resultsLayer.graphics.items.find(el => {
+        if (el.attributes.cadastre_number == cad) {
+          view.goTo({
+            target: el.geometry,
+            zoom: 7
+          },{
+            duration: 500,
+            easing: "ease"
+          }).then(function() {
+            view.popup.open({
+              location: el.geometry.centroid,
+              title: el.popupTemplate.title,
+              content: el.popupTemplate.content,
+              featureMenuOpen: true
+            });
+          });
+        }
+      })
+    }
+
+    const addUlIdCad = () => {
+      let liId = document.createElement('li');
+      let liCad = document.createElement('li');
+      liId.innerHTML = 'Поиск по ID заявления';
+      liCad.innerHTML = 'Поиск по кад. номеру';
+      liId.setAttribute('id', 'id');
+      liId.setAttribute('class', 'liSearch');
+      liCad.setAttribute('id', 'cad');
+      liCad.setAttribute('class', 'liSearch');
+      ulSearch.appendChild(liId);
+      ulSearch.appendChild(liCad);
+    }
+
+    const addChangeSearch = () => {
+      let li = document.createElement('li');
+      li.innerHTML = 'Изменить тип поиска';
+      li.setAttribute('id', 'changeSearch');
+      li.setAttribute('class', 'liSearch');
+      ulSearch.appendChild(li);
+    }
+
+    const checkValue = value => {
+
+      clearUl();
+
+      if (searchBy == 'cad') {
+        backData.forEach((el1) => {
+          el1.forEach((el2) => {
+            peakResults.forEach((el3) => {
+              if (el2.cadastral_number == el3.attributes.cadastre_number) {
+                var li_elements = document.querySelectorAll('ul > li');
+                var li_repeat = false;
+
+                // if (~el2.cadastral_number.indexOf(value, 0)) {
+                if (el2.cadastral_number.substring(0, value.length) == value) {
+                  li_elements.forEach((li) => {
+                    if (el2.cadastral_number == li.innerHTML) {
+                        li_repeat = true;
+                    }
+                  })
+                  if (!li_repeat) {
+                    setUl(el2.cadastral_number, '');
+                    return;
+                  }
+                }
+              }
+            })
+
+          })
+        })
+      } else if (searchBy == 'id') {
+
+        backData.forEach((el1) => {
+          el1.forEach((el2) => {
+            peakResults.forEach((el3) => {
+              if (el2.cadastral_number == el3.attributes.cadastre_number) {
+                var li_elements = document.querySelectorAll('ul > li');
+                var li_repeat = false;
+                var idText = String(el2.id);
+                if (idText.substring(0, value.length) == value) {
+                  li_elements.forEach((li) => {
+                    if (idText == li.innerHTML) {
+                        li_repeat = true;
+                    }
+                  })
+                  if (!li_repeat) {
+                    setUl(el2.cadastral_number, idText);
+                    return;
+                  }
+                }
+              }
+            })
+          })
+        })
+      }
+    };
+
+    const clearUl = () => {
+      while (ulSearch.firstChild) {
+        ulSearch.removeChild(ulSearch.firstChild);
+      }
+    }
+
+    const setUl = (cad, id) => {
+      let li = document.createElement('li');
+      if (id.length !== 0) {
+        li.setAttribute('name', cad);
+        li.innerHTML = id;
+      } else {
+        li.setAttribute('name', cad);
+        li.innerHTML = cad;
+      }
+      li.setAttribute('class', 'liSearch');
+      ulSearch.appendChild(li);
+
+    }
+
+    function backEnd(e) {
+      onClickLoader.style.display = 'inline-block';
       if (e == 'apz'){
         service.innerHTML = "АПЗ";
 
@@ -97,11 +429,13 @@ require([
         xmlhttp.onload = function() {
           if (this.readyState == 4 && this.status == 200) {
             clearData();
-            onClickLoader.style.display = 'inline-block';
             resultsLayer.removeAll();
             setTableData('', '', '');
             var myArr = JSON.parse(this.responseText);
             myFunction(myArr, 'apz');
+          } else {
+            // Запрос не удался ???
+            onClickLoader.style.display = 'none'; // Потом убрать
           }
         };
 
@@ -119,11 +453,13 @@ require([
         xmlhttp.onload = function() {
           if (this.readyState == 4 && this.status == 200) {
             clearData();
-            onClickLoader.style.display = 'inline-block';
             resultsLayer.removeAll();
             setTableData('', '', '');
             var myArr = JSON.parse(this.responseText);
             myFunction(myArr, 'sketch');
+          } else {
+            // Запрос не удался ???
+            onClickLoader.style.display = 'none'; // Потом убрать
           }
         };
 
@@ -142,43 +478,52 @@ require([
 
               switch (item.apz_status.name) {
                 case "Принято":
-                  green.push({
-                    cadastral_number: trueCad(item.cadastral_number), // Кадастровый номер
-                    project_name: item.project_name, // Наименование проектируемого объекта
-                    object_type: item.object_type, // Тип объекта
-                    object_area: item.object_area, // Площадь здания (кв.м)
-                    object_level: item.object_level, // Этажность
-                    object_term: item.object_term, // Срок строительства по нормам
-                    customer: item.customer, // Заказчик
-                    create: item.apz_start //Дата начала обработки заявки
-                  });
+                  if (!green.includes(item.cadastral_number)) {
+                  // if (checkRepeat(item.cadastral_number, green)) {
+                    green.push({
+                      id: item.id, // id заявления
+                      cadastral_number: trueCad(item.cadastral_number), // Кадастровый номер
+                      project_name: item.project_name, // Наименование проектируемого объекта
+                      object_type: item.object_type, // Тип объекта
+                      object_area: item.object_area, // Площадь здания (кв.м)
+                      object_level: item.object_level, // Этажность
+                      object_term: item.object_term, // Срок строительства по нормам
+                      customer: item.customer, // Заказчик
+                      create: item.apz_start //Дата начала обработки заявки
+                    });
+                  }
                   break;
                 case "Отказано":
-                  red.push({
-                    cadastral_number: trueCad(item.cadastral_number),
-                    project_name: item.project_name,
-                    object_type: item.object_type,
-                    object_area: item.object_area,
-                    object_level: item.object_level,
-                    object_term: item.object_term,
-                    customer: item.customer,
-                    create: item.apz_start
-                  });
+                  if (!red.includes(item.cadastral_number)) {
+                    red.push({
+                      id: item.id,
+                      cadastral_number: trueCad(item.cadastral_number),
+                      project_name: item.project_name,
+                      object_type: item.object_type,
+                      object_area: item.object_area,
+                      object_level: item.object_level,
+                      object_term: item.object_term,
+                      customer: item.customer,
+                      create: item.apz_start
+                    });
+                  }
                   break;
                 case "Черновик":
-                // console.log(item.apz_status.name);
                   break;
                 default:
-                  purple.push({
-                    cadastral_number: trueCad(item.cadastral_number),
-                    project_name: item.project_name,
-                    object_type: item.object_type,
-                    object_area: item.object_area,
-                    object_level: item.object_level,
-                    object_term: item.object_term,
-                    customer: item.customer,
-                    create: item.apz_start
-                  });
+                  if (!purple.includes(item.cadastral_number)) {
+                    purple.push({
+                      id: item.id,
+                      cadastral_number: trueCad(item.cadastral_number),
+                      project_name: item.project_name,
+                      object_type: item.object_type,
+                      object_area: item.object_area,
+                      object_level: item.object_level,
+                      object_term: item.object_term,
+                      customer: item.customer,
+                      create: item.apz_start
+                    });
+                  }
               }
 
             }// if
@@ -193,6 +538,7 @@ require([
               switch (item.sketch_status.name) {
                 case "Принято":
                   green.push({
+                    id: item.id,
                     cadastral_number: setCad(item.id), // Кадастровый номер
                     project_name: item.project_name, // Наименование проектируемого объекта
                     object_area: item.common_area, // Общая площадь (м2)
@@ -205,6 +551,7 @@ require([
                   break;
                 case "Отказано":
                   red.push({
+                    id: item.id,
                     cadastral_number: setCad(item.id),
                     project_name: item.project_name,
                     object_area: item.common_area,
@@ -217,6 +564,7 @@ require([
                   break;
                 default:
                   purple.push({
+                    id: item.id,
                     cadastral_number: setCad(item.id),
                     project_name: item.project_name,
                     object_area: item.common_area,
@@ -266,16 +614,17 @@ require([
     // Вызывается каждый раз, когда запрос прошел
     function getResults(response) {
 
-      var peakResults = response.features.map(function(feature) {
+      peakResults = response.features.map(function(feature) {
 
         feature.symbol = symbolColor(feature.attributes.cadastre_number);
         feature.popupTemplate = popupTemplate;
         return feature;
       });
-
-      setTableData(allMassiv[0].length, allMassiv[1].length, allMassiv[2].length);
+      // checkCadastral(peakResults);
+      setTableData(backData[0].length, backData[1].length, backData[2].length);
 
       resultsLayer.addMany(peakResults);
+
       onClickLoader.style.display = 'none';
     }// getResults
 
@@ -323,7 +672,7 @@ require([
 
     }// trueCad
 
-    // Есть ли кад.н.
+    // Присутствует ли кад.н.
     function checkTrueCad(e) {
       if (e && e.substr(0,2) == '20' && e.length >= 11){
         return true;
@@ -382,9 +731,9 @@ require([
     // Поиск статуса кад.н.
     function findStatusCad(e) {
 
-      for (var i = 0; i < allMassiv.length; i++) {
-        for (var j = 0; j < allMassiv[i].length; j++){
-          if (allMassiv[i][j].cadastral_number == e){
+      for (var i = 0; i < backData.length; i++) {
+        for (var j = 0; j < backData[i].length; j++){
+          if (backData[i][j].cadastral_number == e){
             return i;
           }
         }
@@ -393,19 +742,20 @@ require([
 
     // Вывод данных по кад.н.
     function popupCad(index, cad, status) {
-      for (var j = 0; j < allMassiv[index].length; j++){
-        if (allMassiv[index][j].cadastral_number == cad){
+      for (var j = 0; j < backData[index].length; j++){
+        if (backData[index][j].cadastral_number == cad){
 
           popupTemplate = {
             title: status,
-            content: "<b>Наименование проектируемого объекта:</b> " + allMassiv[index][j].project_name + "</br>"+
-            "<b>Заказчик:</b> " + allMassiv[index][j].customer + "</br>"+
-            "<b>Тип объекта:</b> " + allMassiv[index][j].object_type + "</br>"+
-            "<b>Площадь здания (кв.м):</b> " + allMassiv[index][j].object_area + "</br>"+
-            "<b>Этажность:</b> " + allMassiv[index][j].object_level + "</br>"+
-            "<b>Кадастровый номер:</b> " + allMassiv[index][j].cadastral_number + "</br>"+
-            "<b>Срок строительства по нормам:</b> " + allMassiv[index][j].object_term + "</br>"+
-            "<b>Дата начала обработки заявки:</b> " + allMassiv[index][j].create + "</br>"
+            content: "<b>ID заявления:</b> " + backData[index][j].id + "</br>"+
+            +"<b>Наименование проектируемого объекта:</b> " + backData[index][j].project_name + "</br>"+
+            "<b>Заказчик:</b> " + backData[index][j].customer + "</br>"+
+            "<b>Тип объекта:</b> " + backData[index][j].object_type + "</br>"+
+            "<b>Площадь здания (кв.м):</b> " + backData[index][j].object_area + "</br>"+
+            "<b>Этажность:</b> " + backData[index][j].object_level + "</br>"+
+            "<b>Кадастровый номер:</b> " + backData[index][j].cadastral_number + "</br>"+
+            "<b>Срок строительства по нормам:</b> " + backData[index][j].object_term + "</br>"+
+            "<b>Дата начала обработки заявки:</b> " + backData[index][j].create + "</br>"
           };
 
           return popupTemplate;
@@ -417,16 +767,16 @@ require([
     function findCadastr() {
       var text = '';
 
-        allMassiv[0] = green; // accepted
-        allMassiv[1] = purple; // active
-        allMassiv[2] = red; // declined
+        backData[0] = green; // accepted
+        backData[1] = purple; // active
+        backData[2] = red; // declined
 
-      for (var i = 0; i < allMassiv.length; i++) {
-        for (var j = 0; j < allMassiv[i].length; j++) {
-          if (i == 2 && j == (allMassiv[2].length-1)){
-            text += allMassiv[i][j].cadastral_number;
+      for (var i = 0; i < backData.length; i++) {
+        for (var j = 0; j < backData[i].length; j++) {
+          if (i == 2 && j == (backData[2].length-1)){ // ???
+            text += backData[i][j].cadastral_number;
           } else {
-            text += allMassiv[i][j].cadastral_number + "', '";
+            text += backData[i][j].cadastral_number + "', '";
           }
         }// for j
       }// for i
@@ -434,9 +784,41 @@ require([
       return text;
     }// findCadastr
 
+    const checkCadastral = results => {//???
+
+      var infoOne = [];
+      var infoTwo = [];
+      var infoThree = [];
+
+      backData[0].forEach((el) => {
+        results.forEach((el1)=> {
+          if (el.cadastral_number == el1.attributes.cadastre_number) {
+            infoOne.push(el);
+          }
+        })
+      })
+      backData[1].forEach((el) => {
+        results.forEach((el1)=> {
+          if (el.cadastral_number == el1.attributes.cadastre_number) {
+            infoTwo.push(el);
+          }
+        })
+      })
+      backData[2].forEach((el) => {
+        results.forEach((el1)=> {
+          if (el.cadastral_number == el1.attributes.cadastre_number) {
+            infoThree.push(el);
+          }
+        })
+      })
+      backData[0] = infoOne;
+      backData[1] = infoTwo;
+      backData[2] = infoThree;
+    }
+
     // Чистка данных
     function clearData() {
-      allMassiv = [];
+      backData = [];
       green = [];
       red = [];
       purple = [];

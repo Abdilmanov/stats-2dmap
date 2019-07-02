@@ -176,6 +176,7 @@ require([
         };
 
         input.addEventListener('keypress', function(e) {
+
           if (searchBy == 'change') {
             // input.addEventListener('keypress', function(e) {
               if (input.value.length > 0) {
@@ -234,7 +235,7 @@ require([
               clearUl();
               addChangeSearch();
             }
-          }else if (searchBy == 'id') {
+          } else if (searchBy == 'id') {
             if (input.value == '') {
               clearUl();
               addChangeSearch();
@@ -268,6 +269,7 @@ require([
         case 'cad':
           removeInvalid();
           input.placeholder = 'Введите кад. номер';
+          input.value = '';
           searchBy = 'cad';
           input.classList.add('borderInput');
           clearUl();
@@ -275,12 +277,14 @@ require([
         case 'id':
           removeInvalid();
           input.placeholder = 'Введите ID заявления';
+          input.value = '';
           searchBy = 'id';
           input.classList.add('borderInput');
           clearUl();
           break;
         case 'changeSearch':
           input.placeholder = 'Выберите тип поиска';
+          input.value = '';
           searchBy = 'change';
           clearUl();
           addUlIdCad();
@@ -288,7 +292,7 @@ require([
         default:
           clearUl();
           addChangeSearch();
-          goToBuild(e.toElement.attributes[0].nodeValue);
+          goToBuild(e.toElement.attributes[0].nodeValue, e.toElement.innerText);
       }
     })
 
@@ -302,9 +306,10 @@ require([
       cad.classList.remove("invalid");
     }
 
-    const goToBuild = cad => {
+    const goToBuild = (cad, text) => {
       resultsLayer.graphics.items.find(el => {
         if (el.attributes.cadastre_number == cad) {
+          input.value = text;
           view.goTo({
             target: el.geometry,
             zoom: 7
@@ -340,6 +345,24 @@ require([
       let li = document.createElement('li');
       li.innerHTML = 'Изменить тип поиска';
       li.setAttribute('id', 'changeSearch');
+      li.setAttribute('class', 'liSearch');
+      ulSearch.appendChild(li);
+    }
+
+    const checkNotFound = () => {
+
+      if (input.value.length > 0 && !document.querySelector('ul > li')) {
+        if (!document.getElementById('notFound')) {
+          console.log(3);
+          notFound();
+        }
+      }
+    }
+
+    const notFound = () => {
+      let li = document.createElement('li');
+      li.innerHTML = 'Ничего не найдено';
+      li.setAttribute('id', 'notFound');
       li.setAttribute('class', 'liSearch');
       ulSearch.appendChild(li);
     }
@@ -398,6 +421,7 @@ require([
           })
         })
       }
+      checkNotFound();
     };
 
     const clearUl = () => {

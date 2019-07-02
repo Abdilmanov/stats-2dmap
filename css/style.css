@@ -96,6 +96,7 @@ td:last-child {
 }
 .liSearch:last-child {
   border: 0;
+  border-radius: 0px 0px 15px 15px;
 }
 .liSearch:hover {
   background-color: #fffbc3;

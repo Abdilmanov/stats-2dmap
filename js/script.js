@@ -557,7 +557,7 @@ require([
 
           })// foreach
         } else if (e == 'sketch'){
-          
+
           arr.forEach(function(item, i) {
 
             if (checkTrueidSketch(item.id)) {
@@ -824,6 +824,7 @@ require([
             //-----------------------------------
             window.viewOrDownloadFile = () => {
               // console.log(url+", "+id);
+              var id = backData[index][j].id;
                   var token = "bQ9kWmn3Fq51D6bfh7pLkuju0zYqTELQnzeKuQM4";
                   var xhr = new XMLHttpRequest();
                   xhr.open("get","https://api.uaig.kz:8843/api/print/sketch/" + id, true);

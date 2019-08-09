@@ -557,24 +557,40 @@ require([
 
           })// foreach
         } else if (e == 'sketch'){
-
+          
           arr.forEach(function(item, i) {
 
             if (checkTrueidSketch(item.id)) {
 
               switch (item.sketch_status.name) {
                 case "Принято":
-                  green.push({
-                    id: item.id,
-                    cadastral_number: setCad(item.id), // Кадастровый номер
-                    project_name: item.project_name, // Наименование проектируемого объекта
-                    object_area: item.common_area, // Общая площадь (м2)
-                    object_type: item.object_type, // Тип объекта
-                    object_level: item.object_level, // Этажность
-                    object_term: item.object_term, // Срок строительства по нормам
-                    customer: item.customer, // Заказчик
-                    create: item.created_at //Дата начала обработки заявки
-                  });
+                  if (findPdf(item.files, false)) {
+                    let url = findPdf(item.files, true);
+                    green.push({
+                      id: item.id,
+                      cadastral_number: setCad(item.id), // Кадастровый номер
+                      project_name: item.project_name, // Наименование проектируемого объекта
+                      object_area: item.common_area, // Общая площадь (м2)
+                      object_type: item.object_type, // Тип объекта
+                      object_level: item.object_level, // Этажность
+                      object_term: item.object_term, // Срок строительства по нормам
+                      customer: item.customer, // Заказчик
+                      create: item.created_at, //Дата начала обработки заявки
+                      url: url, //Ссылка на просмотр pdf файла
+                    });
+                  } else {
+                    green.push({
+                      id: item.id,
+                      cadastral_number: setCad(item.id), // Кадастровый номер
+                      project_name: item.project_name, // Наименование проектируемого объекта
+                      object_area: item.common_area, // Общая площадь (м2)
+                      object_type: item.object_type, // Тип объекта
+                      object_level: item.object_level, // Этажность
+                      object_term: item.object_term, // Срок строительства по нормам
+                      customer: item.customer, // Заказчик
+                      create: item.created_at //Дата начала обработки заявки
+                    });
+                  }
                   break;
                 case "Отказано":
                   red.push({
@@ -609,15 +625,31 @@ require([
         }// else if
 
 
+
         doQuery();
 
       } // myFunction
 
     } // backEnd
 
+    const findPdf = (array, bool) => {
+      let url;
+      array.forEach((el) => {
+        if (el.category_id == 1) {
+          url = el.url;
+          return
+        }
+      })
+      if (bool) {
+        return url;
+      } else {
+        return true;
+      }
+    }
+
     // Запрос на arcgis
     function doQuery() {
-
+      // console.log(green);
       var sqlTxt;
 
       sqlTxt = "cadastre_number IN ('" + findCadastr() + "')";
@@ -772,23 +804,77 @@ require([
       for (var j = 0; j < backData[index].length; j++){
         if (backData[index][j].cadastral_number == cad){
 
-          popupTemplate = {
-            title: status,
-            content: "<b>ID заявления:</b> " + backData[index][j].id + "</br>"+
-            "<b>Наименование проектируемого объекта:</b> " + backData[index][j].project_name + "</br>"+
-            "<b>Заказчик:</b> " + backData[index][j].customer + "</br>"+
-            "<b>Тип объекта:</b> " + backData[index][j].object_type + "</br>"+
-            "<b>Площадь здания (кв.м):</b> " + backData[index][j].object_area + "</br>"+
-            "<b>Этажность:</b> " + backData[index][j].object_level + "</br>"+
-            "<b>Кадастровый номер:</b> " + backData[index][j].cadastral_number + "</br>"+
-            "<b>Срок строительства по нормам:</b> " + backData[index][j].object_term + "</br>"+
-            "<b>Дата начала обработки заявки:</b> " + backData[index][j].create + "</br>"
-          };
 
+
+          if (backData[index][j].url){
+            popupTemplate = {
+              title: status,
+              content: "<b>ID заявления:</b> " + backData[index][j].id + "</br>"+
+              "<b>Наименование проектируемого объекта:</b> " + backData[index][j].project_name + "</br>"+
+              "<b>Заказчик:</b> " + backData[index][j].customer + "</br>"+
+              "<b>Тип объекта:</b> " + backData[index][j].object_type + "</br>"+
+              "<b>Площадь здания (кв.м):</b> " + backData[index][j].object_area + "</br>"+
+              "<b>Этажность:</b> " + backData[index][j].object_level + "</br>"+
+              "<b>Кадастровый номер:</b> " + backData[index][j].cadastral_number + "</br>"+
+              "<b>Срок строительства по нормам:</b> " + backData[index][j].object_term + "</br>"+
+              "<b>Дата начала обработки заявки:</b> " + backData[index][j].create + "</br>"+
+              "<a class='link' onClick='viewOrDownloadFile()'>Открыть pdf файл</a></br>"
+            };
+
+            //-----------------------------------
+            window.viewOrDownloadFile = () => {
+              // console.log(url+", "+id);
+                  var token = "bQ9kWmn3Fq51D6bfh7pLkuju0zYqTELQnzeKuQM4";
+                  var xhr = new XMLHttpRequest();
+                  xhr.open("get","https://api.uaig.kz:8843/api/print/sketch/" + id, true);
+                  xhr.setRequestHeader("Authorization", "Bearer " + token);
+                  xhr.setRequestHeader("Content-type", "application/json; charset=UTF-8");
+                  xhr.onload = function() {
+                      if (xhr.status === 200) {
+                          var data = JSON.parse(xhr.responseText);
+                          var objbuilder = '';
+                          objbuilder += ('<object width="100%" height="100%" data="data:application/pdf;base64,');
+                          objbuilder += (data.file );
+                          objbuilder += ('" type="application/pdf" class="internal">');
+                          objbuilder += ('<embed src="data:application/pdf;base64,');
+                          objbuilder += (data.file );
+                          objbuilder += ('" type="application/pdf"  />');
+                          objbuilder += ('</object>');
+
+                          var win = window.open("#","_blank");
+                          var title = data.file_name;
+                          win.document.write('<html><title>'+ title +'</title><body style="margin-top:0px; margin-left: 0px; margin-right: 0px; margin-bottom: 0px;">');
+                          win.document.write(objbuilder);
+                          win.document.write('</body></html>');
+                          var layer = $(win.document);
+                      } else {
+                          alert('Не удалось загрузить файл');
+                      }
+                  }
+                  xhr.send();
+              }
+              //-----------------------------------
+
+          } else {
+            popupTemplate = {
+              title: status,
+              content: "<b>ID заявления:</b> " + backData[index][j].id + "</br>"+
+              "<b>Наименование проектируемого объекта:</b> " + backData[index][j].project_name + "</br>"+
+              "<b>Заказчик:</b> " + backData[index][j].customer + "</br>"+
+              "<b>Тип объекта:</b> " + backData[index][j].object_type + "</br>"+
+              "<b>Площадь здания (кв.м):</b> " + backData[index][j].object_area + "</br>"+
+              "<b>Этажность:</b> " + backData[index][j].object_level + "</br>"+
+              "<b>Кадастровый номер:</b> " + backData[index][j].cadastral_number + "</br>"+
+              "<b>Срок строительства по нормам:</b> " + backData[index][j].object_term + "</br>"+
+              "<b>Дата начала обработки заявки:</b> " + backData[index][j].create + "</br>"
+            };
+          }
           return popupTemplate;
         }
       }
     }// popupCad
+
+
 
     // Поиск всех кад.н.
     function findCadastr() {

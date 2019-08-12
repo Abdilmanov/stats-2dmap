@@ -818,7 +818,7 @@ require([
               "<b>Кадастровый номер:</b> " + backData[index][j].cadastral_number + "</br>"+
               "<b>Срок строительства по нормам:</b> " + backData[index][j].object_term + "</br>"+
               "<b>Дата начала обработки заявки:</b> " + backData[index][j].create + "</br>"+
-              "<a class='link' onClick='viewOrDownloadFile()'>Открыть pdf файл</a></br>"
+              "<a class='link' onClick='viewOrDownloadFile()'>Просмотр эскизного проекта</a></br>"
             };
 
             //-----------------------------------
@@ -827,7 +827,7 @@ require([
               var id = backData[index][j].id;
                   var token = "bQ9kWmn3Fq51D6bfh7pLkuju0zYqTELQnzeKuQM4";
                   var xhr = new XMLHttpRequest();
-                  xhr.open("get","https://api.uaig.kz:8843/api/print/sketch/" + id, true);
+                  xhr.open("get","https://api.uaig.kz:8843/api/print/sketch/accepted/" + id, true);
                   xhr.setRequestHeader("Authorization", "Bearer " + token);
                   xhr.setRequestHeader("Content-type", "application/json; charset=UTF-8");
                   xhr.onload = function() {

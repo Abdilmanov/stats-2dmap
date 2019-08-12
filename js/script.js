@@ -640,7 +640,7 @@ require([
         }
       })
       if (bool) {
-        return url;
+        return id;
       } else {
         return true;
       }

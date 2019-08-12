@@ -353,7 +353,6 @@ require([
 
       if (input.value.length > 0 && !document.querySelector('ul > li')) {
         if (!document.getElementById('notFound')) {
-          console.log(3);
           notFound();
         }
       }
@@ -564,9 +563,8 @@ require([
 
               switch (item.sketch_status.name) {
                 case "Принято":
-                console.log(item.files);
                   if (findPdf(item.files, false)) {
-                    let url = findPdf(item.files, true);
+                    let sketchId = findPdf(item.files, true);
                     green.push({
                       id: item.id,
                       cadastral_number: setCad(item.id), // Кадастровый номер
@@ -577,7 +575,7 @@ require([
                       object_term: item.object_term, // Срок строительства по нормам
                       customer: item.customer, // Заказчик
                       create: item.created_at, //Дата начала обработки заявки
-                      url: url, //Ссылка на просмотр pdf файла
+                      sketchId: sketchId, //Ссылка на просмотр pdf файла
                     });
                   } else {
                     green.push({
@@ -634,11 +632,11 @@ require([
     } // backEnd
 
     const findPdf = (array, bool) => {
-      let url;
+      let id;
       array.forEach((el) => {
-        if (el.category_id == 2) {
-          url = el.url;
-          return
+        if (el.category_id == 1) {
+          id = el.id;
+          return;
         }
       })
       if (bool) {
@@ -650,7 +648,6 @@ require([
 
     // Запрос на arcgis
     function doQuery() {
-      // console.log(green);
       var sqlTxt;
 
       sqlTxt = "cadastre_number IN ('" + findCadastr() + "')";
@@ -824,11 +821,11 @@ require([
 
             //-----------------------------------
             window.viewOrDownloadFile = () => {
-              // console.log(url+", "+id);
               var id = backData[index][j].id;
+              var sketchId = backData[index][j].sketchId;
                   var token = "bQ9kWmn3Fq51D6bfh7pLkuju0zYqTELQnzeKuQM4";
                   var xhr = new XMLHttpRequest();
-                  xhr.open("get","https://api.uaig.kz:8843/api/print/sketch/accepted/" + id, true);
+                  xhr.open("get","https://api.uaig.kz:8843/api/download/accepted/" + id + "/" + sketchId +, true);
                   xhr.setRequestHeader("Authorization", "Bearer " + token);
                   xhr.setRequestHeader("Content-type", "application/json; charset=UTF-8");
                   xhr.onload = function() {

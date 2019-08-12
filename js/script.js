@@ -825,7 +825,7 @@ require([
               var sketchId = backData[index][j].sketchId;
                   var token = "bQ9kWmn3Fq51D6bfh7pLkuju0zYqTELQnzeKuQM4";
                   var xhr = new XMLHttpRequest();
-                  xhr.open("get","https://api.uaig.kz:8843/api/download/accepted/" + id + "/" + sketchId, true);
+                  xhr.open("get","https://api.uaig.kz:8843/api/download/accepted/" + sketchId + "/" + id, true);
                   xhr.setRequestHeader("Authorization", "Bearer " + token);
                   xhr.setRequestHeader("Content-type", "application/json; charset=UTF-8");
                   xhr.onload = function() {

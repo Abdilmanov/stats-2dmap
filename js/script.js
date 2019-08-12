@@ -804,7 +804,7 @@ require([
 
 
 
-          if (backData[index][j].url){
+          if (backData[index][j].id){
             popupTemplate = {
               title: status,
               content: "<b>ID заявления:</b> " + backData[index][j].id + "</br>"+

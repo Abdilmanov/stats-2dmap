@@ -847,7 +847,6 @@ require([
                           win.document.write('<html><title>'+ title +'</title><body style="margin-top:0px; margin-left: 0px; margin-right: 0px; margin-bottom: 0px;">');
                           win.document.write(objbuilder);
                           win.document.write('</body></html>');
-                          var layer = $(win.document);
                       } else {
                           alert('Не удалось загрузить файл');
                       }

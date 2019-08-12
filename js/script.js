@@ -564,6 +564,7 @@ require([
 
               switch (item.sketch_status.name) {
                 case "Принято":
+                console.log(item.files);
                   if (findPdf(item.files, false)) {
                     let url = findPdf(item.files, true);
                     green.push({
@@ -635,7 +636,7 @@ require([
     const findPdf = (array, bool) => {
       let url;
       array.forEach((el) => {
-        if (el.category_id == 1) {
+        if (el.category_id == 2) {
           url = el.url;
           return
         }

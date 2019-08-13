@@ -804,7 +804,7 @@ require([
 
 
 
-          if (backData[index][j].id){
+          if (backData[index][j].sketchId){
             popupTemplate = {
               title: status,
               content: "<b>ID заявления:</b> " + backData[index][j].id + "</br>"+

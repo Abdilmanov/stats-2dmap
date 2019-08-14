@@ -30,7 +30,7 @@ require([
         cadastral_number:"20-321-070-153"
       },
       {
-        id: "106",
+        id: "106",//test
         cadastral_number:"20-311-015-268"
       }
       // {
@@ -834,25 +834,46 @@ require([
                   xhr.setRequestHeader("Authorization", "Bearer " + token);
                   xhr.setRequestHeader("Content-type", "application/json; charset=UTF-8");
                   xhr.onload = function() {
-                      if (xhr.status === 200) {
-                          var data = JSON.parse(xhr.responseText);
-                          var objbuilder = '';
-                          objbuilder += ('<object width="100%" height="100%" data="data:application/pdf;base64,');
-                          objbuilder += (data.file );
-                          objbuilder += ('" type="application/pdf" class="internal">');
-                          objbuilder += ('<embed src="data:application/pdf;base64,');
-                          objbuilder += (data.file );
-                          objbuilder += ('" type="application/pdf"  />');
-                          objbuilder += ('</object>');
+                    if (xhr.status === 200) {
+                      var data = JSON.parse(xhr.responseText);
+                      var extenstion = data.file_name.substring(data.file_name.lastIndexOf('.')+1, data.file_name.length);
+                      if(extenstion == 'jpg' || extenstion == 'png' || extenstion == 'dwg' || extenstion == 'tiff'){
+                        // var image = new Image();
+                        // image.src = "data:image/jpg;base64," + data.file;
+                        // var w = window.open("");
+                        // w.document.write(image.outerHTML);
 
-                          var win = window.open("#","_blank");
-                          var title = data.file_name;
-                          win.document.write('<html><title>'+ title +'</title><body style="margin-top:0px; margin-left: 0px; margin-right: 0px; margin-bottom: 0px;">');
-                          win.document.write(objbuilder);
-                          win.document.write('</body></html>');
-                      } else {
-                          alert('Не удалось загрузить файл');
+                        var image = new Image();
+                        image.src = "data:image/jpg;base64," + data.file;
+                        image.style = "width:inherit!important;height:inherit!important";
+                        var win = window.open("#","_blank");
+                        var title = data.file_name;
+                        win.document.write('<html><title>'+ title +'</title><body style="margin-top:0px; margin-left: 0px; margin-right: 0px; margin-bottom: 0px;"><div class="row"><div class="col-md-12" style="width:100%;height:auto">');
+                        win.document.write(image.outerHTML);
+                        win.document.write('</div></div></body></html>');
+                        var layer = $(win.document);
+                      }else if (extenstion == 'pdf'){
+                        var objbuilder = '';
+                        objbuilder += ('<object width="100%" height="100%" data="data:application/pdf;base64,');
+                        objbuilder += (data.file );
+                        objbuilder += ('" type="application/pdf" class="internal">');
+                        objbuilder += ('<embed src="data:application/pdf;base64,');
+                        objbuilder += (data.file );
+                        objbuilder += ('" type="application/pdf"  />');
+                        objbuilder += ('</object>');
+
+                        var win = window.open("#","_blank");
+                        var title = data.file_name;
+                        win.document.write('<html><title>'+ title +'</title><body style="margin-top:0px; margin-left: 0px; margin-right: 0px; margin-bottom: 0px;">');
+                        win.document.write(objbuilder);
+                        win.document.write('</body></html>');
+                        var layer = $(win.document);
+                      }else{
+                        alert("Формат файла не поддерживается");
                       }
+                    } else {
+                      alert('Не удалось загрузить файл');
+                    }
                   }
                   xhr.send();
               }

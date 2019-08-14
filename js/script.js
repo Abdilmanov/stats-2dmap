@@ -30,9 +30,14 @@ require([
         cadastral_number:"20-321-070-153"
       },
       {
-        id: "72",
+        id: "106",
         cadastral_number:"20-311-015-268"
-    }];
+      }
+      // {
+      //   id: "72",
+      //   cadastral_number:"20-311-015-268"
+      // }
+    ];
 
     // Вытаскиваем слой Базовая_карта_MIL1
     almatyLayer = new TileLayer({

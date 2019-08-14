@@ -838,6 +838,7 @@ require([
                       var data = JSON.parse(xhr.responseText);
                       var extenstion = data.file_name.substring(data.file_name.lastIndexOf('.')+1, data.file_name.length);
                       if(extenstion == 'jpg' || extenstion == 'png' || extenstion == 'dwg' || extenstion == 'tiff'){
+                        console.log('not pdf');
                         // var image = new Image();
                         // image.src = "data:image/jpg;base64," + data.file;
                         // var w = window.open("");
@@ -853,6 +854,7 @@ require([
                         win.document.write('</div></div></body></html>');
                         var layer = $(win.document);
                       }else if (extenstion == 'pdf'){
+                        console.log('pdf');
                         var objbuilder = '';
                         objbuilder += ('<object width="100%" height="100%" data="data:application/pdf;base64,');
                         objbuilder += (data.file );

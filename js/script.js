@@ -852,24 +852,31 @@ require([
                         win.document.write('<html><title>'+ title +'</title><body style="margin-top:0px; margin-left: 0px; margin-right: 0px; margin-bottom: 0px;"><div class="row"><div class="col-md-12" style="width:100%;height:auto">');
                         win.document.write(image.outerHTML);
                         win.document.write('</div></div></body></html>');
-                        var layer = $(win.document);
+                        // var layer = $(win.document);
                       }else if (extenstion == 'pdf'){
                         console.log('pdf');
                         var objbuilder = '';
-                        objbuilder += ('<object width="100%" height="100%" data="data:application/pdf;base64,');
-                        objbuilder += (data.file );
-                        objbuilder += ('" type="application/pdf" class="internal">');
-                        objbuilder += ('<embed src="data:application/pdf;base64,');
-                        objbuilder += (data.file );
-                        objbuilder += ('" type="application/pdf"  />');
-                        objbuilder += ('</object>');
+                        // objbuilder += ('<object width="100%" height="100%" src="data:application/pdf;base64,');
+                        // objbuilder += (data.file );
+                        // objbuilder += ('" type="application/pdf" class="internal">');
+                        // objbuilder += ('<embed src="data:application/pdf;base64,');
+                        // objbuilder += (data.file );
+                        // objbuilder += ('" type="application/pdf"  />');
+                        // objbuilder += ('</object>');
 
                         var win = window.open("#","_blank");
                         var title = data.file_name;
-                        win.document.write('<html><title>'+ title +'</title><body style="margin-top:0px; margin-left: 0px; margin-right: 0px; margin-bottom: 0px;">');
+
+                        objbuilder += '<html>';
+                        objbuilder += '<body style="margin:0!important">';
+                        objbuilder += '<embed width="100%" height="100%" src="data:application/pdf;base64,'+data.file+'" type="application/pdf" />';
+                        objbuilder += '</body>';
+                        objbuilder += '<html>';
+
+                        // win.document.write('<html><title>'+ title +'</title><body style="margin-top:0px; margin-left: 0px; margin-right: 0px; margin-bottom: 0px;">');
                         win.document.write(objbuilder);
-                        win.document.write('</body></html>');
-                        var layer = $(win.document);
+                        // win.document.write('</body></html>');
+                        // var layer = $(win.document);
                       }else{
                         alert("Формат файла не поддерживается");
                       }

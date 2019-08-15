@@ -871,9 +871,14 @@ require([
 
                         //------------------------
 
-                        var file = new Blob([data.file], {type: 'application/pdf'});
-                        var fileURL = URL.createObjectURL(file);
-                        window.open(fileURL);
+                        const win = window.open("","_blank");
+                        let html = '';
+
+                        html += '<html>';
+                        html += '<body style="margin:0!important">';
+                        html += '<embed width="100%" height="100%" src="data:application/pdf;base64,'+data.file+'" type="application/pdf" />';
+                        html += '</body>';
+                        html += '</html>';
 
                       }else{
                         alert("Формат файла не поддерживается");

@@ -872,7 +872,7 @@ require([
                         // objbuilder += '<embed width="100%" height="100%" src="data:application/pdf;base64,'+data.file+'" type="application/pdf" />';
                         // objbuilder += '</body>';
                         // objbuilder += '<html>';
-                        var win = = window.open("");
+                        var win = window.open("");
                         win.document.write("<iframe width='100%' height='100%' src='data:application/pdf;base64, " + encodeURI(data.file)+"'></iframe>")
 
                         // win.document.write('<html><title>'+ title +'</title><body style="margin-top:0px; margin-left: 0px; margin-right: 0px; margin-bottom: 0px;">');

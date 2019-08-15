@@ -871,7 +871,9 @@ require([
 
                         //------------------------
 
-                        window.open("data:application/octet-stream;charset=utf-16le;base64,"+data.file);
+                        var file = new Blob([data.file], {type: 'application/pdf'});
+                        var fileURL = URL.createObjectURL(file);
+                        window.open(fileURL);
 
                       }else{
                         alert("Формат файла не поддерживается");

@@ -855,7 +855,7 @@ require([
                         // var layer = $(win.document);
                       }else if (extenstion == 'pdf'){
                         console.log('pdf');
-                        var objbuilder = '';
+                        // var objbuilder = '';
                         // objbuilder += ('<object width="100%" height="100%" src="data:application/pdf;base64,');
                         // objbuilder += (data.file );
                         // objbuilder += ('" type="application/pdf" class="internal">');
@@ -863,22 +863,16 @@ require([
                         // objbuilder += (data.file );
                         // objbuilder += ('" type="application/pdf"  />');
                         // objbuilder += ('</object>');
-
+                        //
                         // var win = window.open("#","_blank");
-                        var title = data.file_name;
+                        // var title = data.file_name;
 
-                        // objbuilder += '<html>';
-                        // objbuilder += '<body style="margin:0!important">';
-                        // objbuilder += '<embed width="100%" height="100%" src="data:application/pdf;base64,'+data.file+'" type="application/pdf" />';
-                        // objbuilder += '</body>';
-                        // objbuilder += '<html>';
-                        var win = window.open("");
-                        win.document.write("<iframe width='100%' height='100%' src='data:application/pdf;base64, " + encodeURI(data.file)+"'></iframe>")
-
-                        // win.document.write('<html><title>'+ title +'</title><body style="margin-top:0px; margin-left: 0px; margin-right: 0px; margin-bottom: 0px;">');
-                        win.document.write(objbuilder);
-                        // win.document.write('</body></html>');
                         // var layer = $(win.document);
+
+                        //------------------------
+
+                        window.open("data:application/octet-stream;charset=utf-16le;base64,"+data.file);
+
                       }else{
                         alert("Формат файла не поддерживается");
                       }

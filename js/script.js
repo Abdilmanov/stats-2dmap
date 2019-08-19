@@ -871,15 +871,9 @@ require([
 
                         //------------------------
                         console.log(data.file);
-                        var byteCharacters = atob(data.file);
-                        var byteNumbers = new Array(byteCharacters.length);
-                        for (var i = 0; i < byteCharacters.length; i++) {
-                          byteNumbers[i] = byteCharacters.charCodeAt(i);
-                        }
-                        var byteArray = new Uint8Array(byteNumbers);
-                        var file = new Blob([byteArray], { type: 'application/pdf;base64' });
-                        var fileURL = URL.createObjectURL(file);
-                        window.open(fileURL);
+                        let pdfWindow = window.open("");
+                        pdfWindow.document.write("<html<head><title>"+data.file_name+"</title><style>body{margin: 0px;}iframe{border-width: 0px;}</style></head>");
+                        pdfWindow.document.write("<body><embed width='100%' height='100%' src='data:application/pdf;base64, " + encodeURI(data.file)+"#toolbar=0&navpanes=0&scrollbar=0'></embed></body></html>");
 
                       }else{
                         alert("Формат файла не поддерживается");

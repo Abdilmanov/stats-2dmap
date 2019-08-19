@@ -876,8 +876,11 @@ require([
 
                     const blob = b64toBlob(data.file, contentType);
                     const blobUrl = URL.createObjectURL(blob);
-
-                    window.open(blobUrl);
+                    let newWindow = window.open('/');
+                    newWindow.onload = () => {
+                        newWindow.location = blobUrl;
+                        console.log(newWindow);
+                    };
 
                   } else {
                     alert("Формат файла не поддерживается");

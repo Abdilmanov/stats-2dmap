@@ -30,13 +30,9 @@ require([
         cadastral_number:"20-321-070-153"
       },
       {
-        id: "106",//test
+        id: "72",
         cadastral_number:"20-311-015-268"
       }
-      // {
-      //   id: "72",
-      //   cadastral_number:"20-311-015-268"
-      // }
     ];
 
     // Вытаскиваем слой Базовая_карта_MIL1
@@ -855,21 +851,6 @@ require([
                         // var layer = $(win.document);
                       }else if (extenstion == 'pdf'){
                         console.log('pdf');
-                        // var objbuilder = '';
-                        // objbuilder += ('<object width="100%" height="100%" src="data:application/pdf;base64,');
-                        // objbuilder += (data.file );
-                        // objbuilder += ('" type="application/pdf" class="internal">');
-                        // objbuilder += ('<embed src="data:application/pdf;base64,');
-                        // objbuilder += (data.file );
-                        // objbuilder += ('" type="application/pdf"  />');
-                        // objbuilder += ('</object>');
-                        //
-                        // var win = window.open("#","_blank");
-                        // var title = data.file_name;
-
-                        // var layer = $(win.document);
-
-                        //------------------------
 
                         console.log(data);
 
@@ -897,8 +878,8 @@ require([
                         const blob = b64toBlob(data.file, contentType);
                         const blobUrl = URL.createObjectURL(blob);
 
-                        window.location = blobUrl;
-
+                        var win = window.open("#","_blank");
+                        win.location = blobUrl;
 
                       }else{
                         alert("Формат файла не поддерживается");

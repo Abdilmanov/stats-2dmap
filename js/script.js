@@ -822,6 +822,8 @@ require([
 
             //-----------------------------------
             window.viewOrDownloadFile = () => {
+              onClickLoader.style.display = 'inline-block';
+
               var id = backData[index][j].id;
               var sketchId = backData[index][j].sketchId;
                   var token = "bQ9kWmn3Fq51D6bfh7pLkuju0zYqTELQnzeKuQM4";
@@ -877,9 +879,9 @@ require([
 
                         const blob = b64toBlob(data.file, contentType);
                         const blobUrl = URL.createObjectURL(blob);
-
+                        console.log(blobUrl);
                         var win = window.open("#","_blank");
-                        win.location = blobUrl;
+                        win.document.write(blobUrl);
 
                       }else{
                         alert("Формат файла не поддерживается");
@@ -889,6 +891,7 @@ require([
                     }
                   }
                   xhr.send();
+                  onClickLoader.style.display = 'none';
               }
               //-----------------------------------
 

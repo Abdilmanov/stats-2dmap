@@ -870,15 +870,8 @@ require([
                         // var layer = $(win.document);
 
                         //------------------------
-
-                        const win = window.open("","_blank");
-                        let html = '';
-
-                        html += '<html>';
-                        html += '<body style="margin:0!important">';
-                        html += '<embed width="100%" height="100%" src="data:application/pdf;base64,'+data.file+'" type="application/pdf" />';
-                        html += '</body>';
-                        html += '</html>';
+                        console.log(data.file);
+                        window.open("data:application/octet-stream;charset=utf-16le;base64,"+data.file);
 
                       }else{
                         alert("Формат файла не поддерживается");

@@ -885,7 +885,7 @@ require([
                     // var win = window.open("#","_blank");
                     let pdfWindow = window.open("");
                     pdfWindow.document.write("<html><head><title>"+data.file_name+"</title></head>");
-                    pdfWindow.document.write("<body style='height: 100%; width: 100%; overflow: hidden; margin: 0px; background-color: rgb(82, 86, 89);'><embed width='100%' height='100%' name='plugin' id='plugin' src='"+blobUrl"' type='application/pdf' internalinstanceid='70'></embed></body></html>");
+                    pdfWindow.document.write("<body style='height: 100%; width: 100%; overflow: hidden; margin: 0px; background-color: rgb(82, 86, 89);'><embed width='100%' height='100%' name='plugin' id='plugin' src='"+blobUrl+"' type='application/pdf' internalinstanceid='70'></embed></body></html>");
 
                   } else {
                     alert("Формат файла не поддерживается");

@@ -822,78 +822,74 @@ require([
 
             //-----------------------------------
             window.viewOrDownloadFile = () => {
-              onClickLoader.style.display = 'inline-block';
 
               var id = backData[index][j].id;
               var sketchId = backData[index][j].sketchId;
-                  var token = "bQ9kWmn3Fq51D6bfh7pLkuju0zYqTELQnzeKuQM4";
-                  var xhr = new XMLHttpRequest();
-                  xhr.open("get","https://api.uaig.kz:8843/api/file/download/accepted/" + sketchId + "/" + id, true);
-                  xhr.setRequestHeader("Authorization", "Bearer " + token);
-                  xhr.setRequestHeader("Content-type", "application/json; charset=UTF-8");
-                  xhr.onload = function() {
-                    if (xhr.status === 200) {
-                      var data = JSON.parse(xhr.responseText);
-                      var extenstion = data.file_name.substring(data.file_name.lastIndexOf('.')+1, data.file_name.length);
-                      if(extenstion == 'jpg' || extenstion == 'png' || extenstion == 'dwg' || extenstion == 'tiff'){
-                        console.log('not pdf');
-                        // var image = new Image();
-                        // image.src = "data:image/jpg;base64," + data.file;
-                        // var w = window.open("");
-                        // w.document.write(image.outerHTML);
+              var token = "bQ9kWmn3Fq51D6bfh7pLkuju0zYqTELQnzeKuQM4";
+              var xhr = new XMLHttpRequest();
+              xhr.open("get","https://api.uaig.kz:8843/api/file/download/accepted/" + sketchId + "/" + id, true);
+              xhr.setRequestHeader("Authorization", "Bearer " + token);
+              xhr.setRequestHeader("Content-type", "application/json; charset=UTF-8");
+              xhr.onload = function() {
+                onClickLoader.style.display = 'inline-block';
+                if (xhr.status === 200) {
+                  var data = JSON.parse(xhr.responseText);
+                  var extenstion = data.file_name.substring(data.file_name.lastIndexOf('.')+1, data.file_name.length);
+                  if(extenstion == 'jpg' || extenstion == 'png' || extenstion == 'dwg' || extenstion == 'tiff'){
+                    console.log('not pdf');
+                    // var image = new Image();
+                    // image.src = "data:image/jpg;base64," + data.file;
+                    // var w = window.open("");
+                    // w.document.write(image.outerHTML);
 
-                        var image = new Image();
-                        image.src = "data:image/jpg;base64," + data.file;
-                        image.style = "width:inherit!important;height:inherit!important";
-                        var win = window.open("#","_blank");
-                        var title = data.file_name;
-                        win.document.write('<html><title>'+ title +'</title><body style="margin-top:0px; margin-left: 0px; margin-right: 0px; margin-bottom: 0px;"><div class="row"><div class="col-md-12" style="width:100%;height:auto">');
-                        win.document.write(image.outerHTML);
-                        win.document.write('</div></div></body></html>');
-                        // var layer = $(win.document);
-                      }else if (extenstion == 'pdf'){
-                        console.log('pdf');
+                    var image = new Image();
+                    image.src = "data:image/jpg;base64," + data.file;
+                    image.style = "width:inherit!important;height:inherit!important";
+                    var win = window.open("#","_blank");
+                    var title = data.file_name;
+                    win.document.write('<html><title>'+ title +'</title><body style="margin-top:0px; margin-left: 0px; margin-right: 0px; margin-bottom: 0px;"><div class="row"><div class="col-md-12" style="width:100%;height:auto">');
+                    win.document.write(image.outerHTML);
+                    win.document.write('</div></div></body></html>');
+                    // var layer = $(win.document);
+                  } else if (extenstion == 'pdf') {
 
-                        console.log(data);
+                    const b64toBlob = (b64Data, contentType = '', sliceSize = 512) => {
+                      const byteCharacters = atob(b64Data);
+                      const byteArrays = [];
 
-                        const b64toBlob = (b64Data, contentType='', sliceSize=512) => {
-                          const byteCharacters = atob(b64Data);
-                          const byteArrays = [];
+                      for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+                        const slice = byteCharacters.slice(offset, offset + sliceSize);
 
-                          for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {
-                            const slice = byteCharacters.slice(offset, offset + sliceSize);
-
-                            const byteNumbers = new Array(slice.length);
-                            for (let i = 0; i < slice.length; i++) {
-                              byteNumbers[i] = slice.charCodeAt(i);
-                            }
-
-                            const byteArray = new Uint8Array(byteNumbers);
-                            byteArrays.push(byteArray);
-                          }
-
-                          const blob = new Blob(byteArrays, {type: contentType});
-                          return blob;
+                        const byteNumbers = new Array(slice.length);
+                        for (let i = 0; i < slice.length; i++) {
+                          byteNumbers[i] = slice.charCodeAt(i);
                         }
-                        const contentType = 'application/pdf';
 
-                        const blob = b64toBlob(data.file, contentType);
-                        const blobUrl = URL.createObjectURL(blob);
-                        console.log(blobUrl);
-                        var win = window.open("#","_blank");
-                        win.document.write(blobUrl);
-
-                      }else{
-                        alert("Формат файла не поддерживается");
+                        const byteArray = new Uint8Array(byteNumbers);
+                        byteArrays.push(byteArray);
                       }
-                    } else {
-                      alert('Не удалось загрузить файл');
+
+                      const blob = new Blob(byteArrays, {type: contentType});
+                      return blob;
                     }
+                    const contentType = 'application/pdf';
+
+                    const blob = b64toBlob(data.file, contentType);
+                    const blobUrl = URL.createObjectURL(blob);
+
+                    window.open(blobUrl);
+
+                  } else {
+                    alert("Формат файла не поддерживается");
                   }
-                  xhr.send();
-                  onClickLoader.style.display = 'none';
+                } else {
+                  alert('Не удалось загрузить файл');
+                }
+                onClickLoader.style.display = 'none';
               }
-              //-----------------------------------
+              xhr.send();
+            }
+            //-----------------------------------
 
           } else {
             popupTemplate = {
